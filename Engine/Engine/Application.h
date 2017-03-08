@@ -9,12 +9,11 @@
 //======================================================================================
 // Includes
 //======================================================================================
-// Tell SDL not to mess with main()
-#define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_syswm.h>
+#include "Common.h"
+#include <string>
 
 class Renderer;
+class Window;
 //======================================================================================
 
 //======================================================================================
@@ -26,17 +25,18 @@ public:
 	Application();
 	~Application();
 
-	void Initialize();
-	void Run();
+	void Initialize( const std::string& appName, u32 windowWidth, u32 windowHeight );
+	bool Run();
 	void Terminate();
-
+	
 private:
+	NONCOPYABLE(Application)
 
 private:
 	bool mIsRunning = true;
-
-	SDL_Window* mWindow = nullptr;
 	Renderer* mRenderer;
+
+	Window* mWindow;
 };
 //======================================================================================
 #endif //ENGINE_APPLICATION_H__

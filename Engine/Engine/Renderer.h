@@ -4,54 +4,94 @@
 //======================================================================================
 // Filename: Renderer.h
 // Description:
-//
 //======================================================================================
-
-#if defined(__ANDROID__)
-#define VK_USE_PLATFORM_ANDROID_KHR
-#elif defined(__linux__)
-#define VK_USE_PLATFORM_XLIB_KHR
-#elif defined(_WIN32)
-#define VK_USE_PLATFORM_WIN32_KHR
-#endif
-
 
 //======================================================================================
 // Includes
 //======================================================================================
-#include <vulkan/vulkan.hpp>
-#include <glm/glm.hpp>
-#include <vector>
+#include "Platform.h"
 
-struct SDL_Window;
+#include <vector>
+#include <string>
+
+class Window;
 //======================================================================================
 
 //======================================================================================
 // Class Application
 //======================================================================================
+
 class Renderer
 {
 public:
 	Renderer();
     ~Renderer();
 
-	void Initialize( SDL_Window* window );
-	void Terminate();
+	void InitializeWindow( const std::string& appName, int width, int height);
 	
-	void Update();
-	void Render();
+	bool Run();
+
+	Window* GetWindow()						{ return mWindow; }
+
+	const VkInstance						GetVulkanInstance() const							{ return mInstance; }
+	const VkPhysicalDevice					GetVulkanPhysicalDevice() const						{ return mPhysicalDevice; }
+	const VkDevice							GetVulkanDevice() const								{ return mDevice; }
+	const VkQueue							GetVulkanQueue() const								{ return mQueue; }
+	const uint32_t							GetVulkanGraphicsQueueFamily() const				{ return mGraphicsFamilyIndex; }
+	const VkPhysicalDeviceProperties&		GetVulkanPhysicalDeviceProperties() const			{ return mPhysicalDeviceProperties; }
+	const VkPhysicalDeviceMemoryProperties& GetVulkanPhysicalDeviceMemoryProperties() const		{ return mPhysicalDeviceMemoryProperties; }
 
 private:
-	vk::SurfaceKHR CreateVulkanSurface(const vk::Instance& instance, SDL_Window* window);
-	std::vector<const char*> GetAvailableWSIExtensions();
+	NONCOPYABLE(Renderer);
+
+	void SetupLayersAndExtensions();
+
+	void InitVulkanInstance();
+	void TerminateVulkanInstance();
+
+	void InitVulkanDevice();
+	void TerminateVulkanPhysicalDevice();
+
+	void InitVulkanCommandPool();
+	void TerminateVulkanCommandPool();
+
+	void SetupDebug();
+	void InitDebug();
+	void TerminateDebug();
+
+	void FindPhysicalDevice();
+	uint32_t FindGraphicsFamilyIndex();
+
 
 private:
-	std::vector<const char*> mExtensions;
-	std::vector<const char*> mLayers;
+	Window* mWindow = nullptr;
 
-	vk::Instance mInstance;
-	vk::SurfaceKHR mSurface;
+	int mSurfaceWidth = 0;
+	int mSurfaceHeight = 0;
 
+	VkInstance mInstance = VK_NULL_HANDLE;
+	
+	VkDevice mDevice = VK_NULL_HANDLE;
+	VkPhysicalDevice  mPhysicalDevice = VK_NULL_HANDLE;
+	VkPhysicalDeviceProperties mPhysicalDeviceProperties = {};
+	VkPhysicalDeviceMemoryProperties mPhysicalDeviceMemoryProperties = {};
+
+	VkCommandPool mCmdPool = VK_NULL_HANDLE;
+	VkCommandBuffer mCmdBuffer = VK_NULL_HANDLE;
+
+	std::vector<const char*> mInstanceLayers;
+	std::vector<const char*> mInstanceExtensions;
+	
+	std::vector<const char*> mDeviceExtensions;
+
+
+
+	VkDebugReportCallbackEXT mDebugReport = VK_NULL_HANDLE;
+	VkDebugReportCallbackCreateInfoEXT mDebugCallbackCreateInfo = {};
+
+	uint32_t mGraphicsFamilyIndex = 0;
+	VkQueue mQueue;
 };
+
 //======================================================================================
 #endif //ENGINE_RENDERER_H__
