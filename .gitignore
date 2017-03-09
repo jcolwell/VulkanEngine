@@ -11,7 +11,9 @@
 !*.dll
 !*.lib
 
+
 #Ignore
+*.idb
 *.tlog
 *.exe
 
