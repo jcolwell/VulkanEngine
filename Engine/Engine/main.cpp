@@ -27,5 +27,5 @@ int main()
 	}
 	app.Terminate();
 	
-	return EXIT_SUCCESS;
+	return 0;
 }
